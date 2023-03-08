@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, Keyboard, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Image, LayoutAnimation, Animated, Alert } from 'react-native';
+import {LinearGradient} from 'expo-linear-gradient';
 import Task from './Components/Task'
 
 interface BottomProps {
@@ -22,8 +23,8 @@ function BottomScreen(props: BottomProps)
     behavior={Platform.OS === "ios" ? "padding" : "height"}
     style={styles.writeTaskWrapper}
   >
-      {/* Ajoutes une variable pour afficher "envoyer" a la place de retour sur ton clavier */}
-      <TextInput style={styles.input} placeholder={'Write a task'} value={props.task} maxLength={50} onChangeText={text => props.setTask(text)} onSubmitEditing={() => props.addTask()} />
+      {/* Ajoutes une variable pour afficher "envoyer" a la place de retour sur ton clavier*/}
+      <TextInput style={styles.input} placeholder={'Write a task'} value={props.task} maxLength={50} onChangeText={text => props.setTask(text)} onSubmitEditing={() => props.addTask()} returnKeyType="send"/>
       <TouchableOpacity onPress={() => props.addTask()}>
         <View style={styles.addWrapper}>
           <Text style={styles.addText}>+</Text>
@@ -67,11 +68,12 @@ export default function App() {
 
   const addTask = () => {
     Keyboard.dismiss();
-    // setAnimation();
-
+    setAnimation();
     // Ajoutes la variable task au tableau allTasks en utilisant la fonction setAllTasks
     // Une fois que c'est bon, décommentes la fonction ligne 71 !
 
+    if (!(task.length === 0 || task.trim().length === 0))
+      setAllTasks([...allTasks, task])
     setTask("")
     console.log(allTasks)
   }
@@ -90,15 +92,19 @@ export default function App() {
           onPress: () => {
             // Supprimes la tâche à l'index indiqué en utilisant la fonction setAllTasks
             
+            let copyItems = [...allTasks]
+            copyItems.splice(index, 1)
+            setAllTasks(copyItems)
           },
           style: "destructive"
         }
       ]
-    ) // Affiche une pop-up
+    )
   }
 
   return (
     // Change cette balise et ses valeurs pour créer un fond d'écran de couleur dégradée
+    <LinearGradient colors={["#FFE5D4", "#FFB5A4"]} style={styles.container}>
     <View style={styles.container}>
       <SafeAreaView style={styles.mainView}>
         <Text style={styles.title}>Todo List</Text>
@@ -108,12 +114,16 @@ export default function App() {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.imageWrapper}
         >
-          {/*Ajoute une image en dehors des {}*/} 
+          {/*  
+            Ajoute une image en dehors des {}
+          */}
+          <Image source={require("./assets/illustration.png")} style={styles.image}/>
         </KeyboardAvoidingView>}
         <BottomScreen task={task} setTask={setTask} addTask={addTask} />
       </SafeAreaView>
       <StatusBar style="auto"/>
     </View>
+    </LinearGradient>
   );
 }
 
